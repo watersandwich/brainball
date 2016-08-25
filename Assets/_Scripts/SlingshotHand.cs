@@ -1,26 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Assets.Scripts
+namespace Assets._Scripts
 {
     public class SlingshotHand : MonoBehaviour
     {
+        [AssignedInUnity]
         public SteamVR_TrackedObject Controller;
 
+        [AssignedInUnity]
         public GameObject ProjectilePrefab;
 
+        [AssignedInUnity]
+        public GameObject GhostPrefab;
+
+        [AssignedInUnity]
         public Collider GrabArea;
 
+        [AssignedInUnity]
         public Transform LaunchPoint;
 
-        [Header("Adjustment")]
+        [Header("Adjustment"), AssignedInUnity]
         public float MaxDistanceBack;
 
+        [AssignedInUnity]
         public float DistanceMultiplier;
 
+        [AssignedInUnity]
         public bool PauseOnNextShot;
 
         private new Rigidbody rigidbody;
@@ -30,6 +35,7 @@ namespace Assets.Scripts
 
         private LineRenderer lineRenderer;
 
+        [UnityMessage]
         public void Start()
         {
             lineRenderer = GetComponentInChildren<LineRenderer>();
@@ -40,6 +46,7 @@ namespace Assets.Scripts
             Controller.GetComponent<SteamVR_RenderModel>().gameObject.SetActive(false);
         }
 
+        [UnityMessage]
         public void Update()
         {
             if(currentProjectileHolding != null)
@@ -68,6 +75,7 @@ namespace Assets.Scripts
             transform.rotation = Controller.transform.rotation * Quaternion.AngleAxis(90, Vector3.right);
         }
 
+        [UnityMessage]
         public void FixedUpdate()
         {
             rigidbody.MovePosition(Controller.transform.position);
@@ -75,22 +83,21 @@ namespace Assets.Scripts
 
         public void CreateProjectileInSlingshot(GrabHand grabHand)
         {
-            this.currentGrabHand = grabHand;
+            currentGrabHand = grabHand;
 
-            currentProjectileHolding = Instantiate(ProjectilePrefab);
+            currentProjectileHolding = Instantiate(GhostPrefab);
         }
 
         public void Release()
         {
-            var projectile = currentProjectileHolding;
+            var ghost = currentProjectileHolding;
             currentProjectileHolding = null;
             currentGrabHand = null;
 
+            var projectile = (GameObject)Instantiate(ProjectilePrefab, ghost.transform.position, Quaternion.identity);
+            Destroy(ghost);
+            
             var delta = LaunchPoint.transform.position - projectile.transform.position;
-
-            Debug.Log("Delta: " + delta);
-            Debug.Log("Launch Point: " + LaunchPoint.transform.position);
-            Debug.Log("Projectile Position: " + projectile.transform.position);
 
             if (PauseOnNextShot)
             {

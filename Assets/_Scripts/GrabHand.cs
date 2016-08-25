@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 using VRTK;
 
-namespace Assets.Scripts
+namespace Assets._Scripts
 {
+    [UnityComponent]
     public class GrabHand : MonoBehaviour
     {
+        [AssignedInUnity]
         public SteamVR_TrackedObject Controller;
 
+        [AssignedInUnity]
         public Collider GrabArea;
 
         private bool isInSlingshotGrabArea;
@@ -19,6 +18,7 @@ namespace Assets.Scripts
 
         private new Rigidbody rigidbody;
 
+        [UnityMessage]
         public void Start()
         {
             rigidbody = GetComponent<Rigidbody>();
@@ -34,7 +34,6 @@ namespace Assets.Scripts
         {
             if (isInSlingshotGrabArea)
             {
-                Debug.Log("Grabbed Slingshot");
                 isHoldingSlingshot = true;
 
                 currentSlingshotHand.CreateProjectileInSlingshot(this);
@@ -50,6 +49,7 @@ namespace Assets.Scripts
             }
         }
 
+        [UnityMessage]
         public void OnTriggerEnter(Collider other)
         {
             if (other.attachedRigidbody == null || other.attachedRigidbody.GetComponent<SlingshotHand>() == null)
@@ -66,6 +66,7 @@ namespace Assets.Scripts
             }
         }
 
+        [UnityMessage]
         public void OnTriggerExit(Collider other)
         {
             if (other.attachedRigidbody == null || other.attachedRigidbody.GetComponent<SlingshotHand>() == null)
@@ -79,6 +80,7 @@ namespace Assets.Scripts
             }
         }
 
+        [UnityMessage]
         public void FixedUpdate()
         {
             rigidbody.MovePosition(Controller.transform.position);
